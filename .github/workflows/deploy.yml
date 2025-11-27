@@ -1,0 +1,35 @@
+name: CI/CD Pipeline Blue-Green
+
+# Este pipeline se activa automáticamente cuando haces un push a la rama 'main'
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Paso 1: GitHub descarga tu código en su servidor temporal
+    - name: Checkout del código
+      uses: actions/checkout@v3
+
+    # Paso 2: Conexión SSH a tu Droplet para ejecutar los comandos
+    - name: Desplegar en DigitalOcean
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: 22
+        # Estos son los comandos que se ejecutarán en TU servidor automáticamente
+        script: |
+          cd blue-green-repo
+    
+          git pull origin main
+          
+          docker build --build-arg HTML_FILE=app/index-green.html -t app:v2.0-green .
+          
+          chmod +x scripts/switch_traffic.sh
+          
+          ./scripts/switch_traffic.sh
