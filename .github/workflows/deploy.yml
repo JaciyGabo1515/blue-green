@@ -24,7 +24,7 @@ jobs:
         port: 22
         # Estos son los comandos que se ejecutarán en TU servidor automáticamente
         script: |
-          cd blue-green-repo
+          cd blue-green
     
           git pull origin main
           
