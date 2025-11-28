@@ -1,6 +1,5 @@
-name: CI/CD Pipeline Blue-Green
+name: CI/CD Pipeline Blue-Green Automático
 
-# Este pipeline se activa automáticamente cuando haces un push a la rama 'main'
 on:
   push:
     branches: [ "main" ]
@@ -10,11 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Paso 1: GitHub descarga tu código en su servidor temporal
     - name: Checkout del código
       uses: actions/checkout@v3
 
-    # Paso 2: Conexión SSH a tu Droplet para ejecutar los comandos
     - name: Desplegar en DigitalOcean
       uses: appleboy/ssh-action@master
       with:
@@ -22,14 +19,15 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         port: 22
-        # Estos son los comandos que se ejecutarán en TU servidor automáticamente
         script: |
+          # 1. Ir a la carpeta correcta
           cd /home/blue-green
     
+          # 2. Bajar cambios
           git pull origin main
           
-          docker build --build-arg HTML_FILE=app/index-green.html -t app:v2.0-green .
+          # 3. Dar permisos al nuevo script inteligente
+          chmod +x scripts/auto_deploy.sh
           
-          chmod +x scripts/switch_traffic.sh
-          
-          ./scripts/switch_traffic.sh
+          # 4. Ejecutar el script (él decide si construye Blue o Green)
+          ./scripts/auto_deploy.sh
