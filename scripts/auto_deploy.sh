@@ -35,7 +35,7 @@ docker build --build-arg HTML_FILE=$HTML_FILE -t app:latest-$NEW_COLOR .
 # 3. LIMPIEZA Y LANZAMIENTO
 echo "🚀 Lanzando contenedor $NEW_COLOR en puerto $NEW_PORT..."
 docker rm -f $CONTAINER_NAME 2>/dev/null
-docker run -d --name $CONTAINER_NAME -p $NEW_PORT:80 app:latest-$NEW_COLOR
+docker run -d --name $CONTAINER_NAME -p $NEW_PORT:3000 app:latest-$NEW_COLOR
 
 # Esperar a que inicie
 sleep 5

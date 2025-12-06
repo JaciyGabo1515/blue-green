@@ -12,6 +12,16 @@ jobs:
     - name: Checkout del código
       uses: actions/checkout@v3
 
+    - name: Configurar Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Instalar dependencias y Correr Tests
+      run: |
+        npm install
+        npm test
+
     - name: Desplegar en DigitalOcean
       uses: appleboy/ssh-action@master
       with:

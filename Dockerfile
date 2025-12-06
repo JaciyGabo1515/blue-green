@@ -1,14 +1,29 @@
-# Usa una imagen base de Nginx muy ligera (Alpine)
-FROM nginx:alpine
+# Usamos Node en vez de Nginx
+FROM node:alpine
 
-# Argumento para pasar el nombre del archivo HTML que queremos usar
-ARG HTML_FILE=index-blue.html
+# Creamos directorio de trabajo
+WORKDIR /usr/src/app
 
-# Copia el archivo HTML deseado al directorio de servicio por defecto de Nginx
-COPY $HTML_FILE /usr/share/nginx/html/index.html
+# Copiamos archivos de dependencias
+COPY package*.json ./
 
-# El puerto 80 es el puerto interno del contenedor Nginx
-EXPOSE 80
+# Instalamos dependencias
+RUN npm install
 
-# Comando de inicio por defecto de Nginx (ya viene de la imagen base)
-CMD ["nginx", "-g", "daemon off;"]
+# Copiamos el código del servidor
+COPY server.js .
+
+# --- MAGIA BLUE-GREEN ---
+# Recibimos el argumento de cuál HTML usar (igual que antes)
+ARG HTML_FILE=app/index-blue.html
+
+# Copiamos ESE archivo específico y lo renombramos a index.html dentro de la carpeta 'app'
+# Nota: Creamos la carpeta 'app' dentro del contenedor primero
+RUN mkdir app
+COPY ${HTML_FILE} app/index.html
+
+# Node usa el puerto 3000 por defecto
+EXPOSE 3000
+
+# Comando para iniciar
+CMD ["node", "server.js"]
